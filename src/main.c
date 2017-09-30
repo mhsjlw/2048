@@ -71,8 +71,11 @@ uint32_t largest_tile_value(Board *board) {
             }
         }
     }
-
-    return 1 << greatest;
+    if(greatest == 0) {
+      return 0;
+    } else {
+      return 1 << greatest;
+    }
 }
 
 
@@ -299,11 +302,11 @@ int main() {
     read_in_board(fourth_board);
     read_in_board(fifth_board);
 
-    int first_value = calculate_greatest_tile(first_board, 13);
-    int second_value = calculate_greatest_tile(second_board, 13);
-    int third_value = calculate_greatest_tile(third_board, 13);
-    int fourth_value = calculate_greatest_tile(fourth_board, 13);
-    int fifth_value = calculate_greatest_tile(fifth_board, 13);
+    int first_value = calculate_greatest_tile(first_board, 12);
+    int second_value = calculate_greatest_tile(second_board, 12);
+    int third_value = calculate_greatest_tile(third_board, 12);
+    int fourth_value = calculate_greatest_tile(fourth_board, 12);
+    int fifth_value = calculate_greatest_tile(fifth_board, 12);
 
     printf("%i\n", first_value);
     printf("%i\n", second_value);
