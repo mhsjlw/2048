@@ -79,6 +79,7 @@ uint32_t largest_tile_value(Board *board) {
 Board* shift_left(Board *board) {
     Board *b = copy_board(board);
     int32_t x, y;
+    bool didNothing=true;
 
     for (y = 0; y < 4; y++) {
         bool noMove=false;
@@ -89,6 +90,7 @@ Board* shift_left(Board *board) {
                     b->tiles[x - 1][y] = b->tiles[x][y];
                     b->tiles[x][y] = 0;
                     noMove=false;
+                    didNothing=false;
                 }
             }
         }
@@ -97,6 +99,7 @@ Board* shift_left(Board *board) {
             if(b->tiles[x - 1][y] == b->tiles[x][y] && b->tiles[x][y]!=0) {
                 b->tiles[x - 1][y]++;
                 b->tiles[x][y]=0;
+                didNothing=false;
             }
         }
 
@@ -108,10 +111,13 @@ Board* shift_left(Board *board) {
                     b->tiles[x - 1][y] = b->tiles[x][y];
                     b->tiles[x][y] = 0;
                     noMove=false;
+                    didNothing=false;
                 }
             }
         }
     }
+    if(didNothing)
+        return NULL;
 
     return b;
 }
@@ -119,6 +125,7 @@ Board* shift_left(Board *board) {
 Board* shift_right(Board *board) {
     Board *b = copy_board(board);
     int32_t x, y;
+    bool didNothing=true;
 
     for (y = 0; y < 4; y++) {
         bool noMove=false;
@@ -129,6 +136,7 @@ Board* shift_right(Board *board) {
                     b->tiles[x + 1][y] = b->tiles[x][y];
                     b->tiles[x][y] = 0;
                     noMove=false;
+                    didNothing=false;
                 }
             }
         }
@@ -137,6 +145,7 @@ Board* shift_right(Board *board) {
             if(b->tiles[x + 1][y] == b->tiles[x][y] && b->tiles[x][y]!=0) {
                 b->tiles[x + 1][y]++;
                 b->tiles[x][y]=0;
+                didNothing=false;
             }
         }
 
@@ -148,10 +157,13 @@ Board* shift_right(Board *board) {
                     b->tiles[x + 1][y] = b->tiles[x][y];
                     b->tiles[x][y] = 0;
                     noMove=false;
+                    didNothing=false;
                 }
             }
         }
     }
+    if(didNothing)
+        return NULL;
 
     return b;
 }
@@ -159,6 +171,7 @@ Board* shift_right(Board *board) {
 Board* shift_up(Board *board) {
     Board *b = copy_board(board);
     int32_t x, y;
+    bool didNothing=true;
 
     for (x = 0; x < 4; x++) {
         bool noMove=false;
@@ -169,6 +182,7 @@ Board* shift_up(Board *board) {
                     b->tiles[x][y - 1] = b->tiles[x][y];
                     b->tiles[x][y] = 0;
                     noMove=false;
+                    didNothing=false;
                 }
             }
         }
@@ -177,6 +191,7 @@ Board* shift_up(Board *board) {
             if(b->tiles[x][y - 1] == b->tiles[x][y] && b->tiles[x][y]!=0) {
                 b->tiles[x][y - 1]++;
                 b->tiles[x][y] = 0;
+                didNothing=false;
             }
         }
 
@@ -188,10 +203,13 @@ Board* shift_up(Board *board) {
                     b->tiles[x][y - 1] = b->tiles[x][y];
                     b->tiles[x][y] = 0;
                     noMove=false;
+                    didNothing=false;
                 }
             }
         }
     }
+    if(didNothing)
+        return NULL;
 
     return b;
 }
@@ -199,6 +217,7 @@ Board* shift_up(Board *board) {
 Board* shift_down(Board *board) {
     Board *b = copy_board(board);
     int32_t x, y;
+    bool didNothing=true;
 
     for (x = 0; x < 4; x++) {
         bool noMove=false;
@@ -209,6 +228,7 @@ Board* shift_down(Board *board) {
                     b->tiles[x][y + 1] = b->tiles[x][y];
                     b->tiles[x][y] = 0;
                     noMove=false;
+                    didNothing=false;
                 }
             }
         }
@@ -217,6 +237,7 @@ Board* shift_down(Board *board) {
             if(b->tiles[x][y + 1] == b->tiles[x][y] && b->tiles[x][y]!=0) {
                 b->tiles[x][y + 1]++;
                 b->tiles[x][y] = 0;
+                didNothing=false;
             }
         }
 
@@ -228,10 +249,13 @@ Board* shift_down(Board *board) {
                     b->tiles[x][y + 1] = b->tiles[x][y];
                     b->tiles[x][y] = 0;
                     noMove=false;
+                    didNothing=false;
                 }
             }
         }
     }
+    if(didNothing)
+        return NULL;
 
     return b;
 }
@@ -239,18 +263,22 @@ Board* shift_down(Board *board) {
 
 
 uint32_t calculate_greatest_tile(Board *current_state, uint32_t moves_left) {
+    uint32_t currentValue = largest_tile_value(current_state);
     if(moves_left == 0) {
-        uint32_t value = largest_tile_value(current_state);
         free(current_state);
-        return value;
+        return currentValue;
     }
 
     if(moves_left > 0) {
-         uint32_t value = max(
-                calculate_greatest_tile(shift_left(current_state), moves_left - 1),
-                calculate_greatest_tile(shift_right(current_state), moves_left - 1),
-                calculate_greatest_tile(shift_up(current_state), moves_left - 1),
-                calculate_greatest_tile(shift_down(current_state), moves_left - 1)
+        Board * left=shift_left(current_state);
+        Board * right=shift_right(current_state);
+        Board * up=shift_up(current_state);
+        Board * down=shift_down(current_state);
+        uint32_t value = max(
+                left == NULL ? currentValue : calculate_greatest_tile(left, moves_left - 1),
+                right == NULL ? currentValue : calculate_greatest_tile(right, moves_left - 1),
+                up == NULL ? currentValue : calculate_greatest_tile(up, moves_left - 1),
+                down == NULL ? currentValue : calculate_greatest_tile(down, moves_left - 1)
         );
 
         free(current_state);
@@ -259,29 +287,29 @@ uint32_t calculate_greatest_tile(Board *current_state, uint32_t moves_left) {
 }
 
 int main() {
-  Board *first_board = malloc(sizeof(Board));
-  Board *second_board = malloc(sizeof(Board));
-  Board *third_board = malloc(sizeof(Board));
-  Board *fourth_board = malloc(sizeof(Board));
-  Board *fifth_board = malloc(sizeof(Board));
+    Board *first_board = malloc(sizeof(Board));
+    Board *second_board = malloc(sizeof(Board));
+    Board *third_board = malloc(sizeof(Board));
+    Board *fourth_board = malloc(sizeof(Board));
+    Board *fifth_board = malloc(sizeof(Board));
 
-  read_in_board(first_board);
-  read_in_board(second_board);
-  read_in_board(third_board);
-  read_in_board(fourth_board);
-  read_in_board(fifth_board);
+    read_in_board(first_board);
+    read_in_board(second_board);
+    read_in_board(third_board);
+    read_in_board(fourth_board);
+    read_in_board(fifth_board);
 
-  int first_value = calculate_greatest_tile(first_board, 13);
-  int second_value = calculate_greatest_tile(second_board, 13);
-  int third_value = calculate_greatest_tile(third_board, 13);
-  int fourth_value = calculate_greatest_tile(fourth_board, 13);
-  int fifth_value = calculate_greatest_tile(fifth_board, 13);
+    int first_value = calculate_greatest_tile(first_board, 13);
+    int second_value = calculate_greatest_tile(second_board, 13);
+    int third_value = calculate_greatest_tile(third_board, 13);
+    int fourth_value = calculate_greatest_tile(fourth_board, 13);
+    int fifth_value = calculate_greatest_tile(fifth_board, 13);
 
-  printf("%i\n", first_value);
-  printf("%i\n", second_value);
-  printf("%i\n", third_value);
-  printf("%i\n", fourth_value);
-  printf("%i\n", fifth_value);
+    printf("%i\n", first_value);
+    printf("%i\n", second_value);
+    printf("%i\n", third_value);
+    printf("%i\n", fourth_value);
+    printf("%i\n", fifth_value);
 
     return 0;
 }
