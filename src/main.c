@@ -259,11 +259,29 @@ uint32_t calculate_greatest_tile(Board *current_state, uint32_t moves_left) {
 }
 
 int main() {
-    Board *board = malloc(sizeof(Board));
-    read_in_board(board);
+  Board *first_board = malloc(sizeof(Board));
+  Board *second_board = malloc(sizeof(Board));
+  Board *third_board = malloc(sizeof(Board));
+  Board *fourth_board = malloc(sizeof(Board));
+  Board *fifth_board = malloc(sizeof(Board));
 
-    int value = calculate_greatest_tile(board, 12);
-    printf("%i", value);
+  read_in_board(first_board);
+  read_in_board(second_board);
+  read_in_board(third_board);
+  read_in_board(fourth_board);
+  read_in_board(fifth_board);
+
+  int first_value = calculate_greatest_tile(first_board, 13);
+  int second_value = calculate_greatest_tile(second_board, 13);
+  int third_value = calculate_greatest_tile(third_board, 13);
+  int fourth_value = calculate_greatest_tile(fourth_board, 13);
+  int fifth_value = calculate_greatest_tile(fifth_board, 13);
+
+  printf("%i\n", first_value);
+  printf("%i\n", second_value);
+  printf("%i\n", third_value);
+  printf("%i\n", fourth_value);
+  printf("%i\n", fifth_value);
 
     return 0;
 }
